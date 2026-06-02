@@ -18,4 +18,6 @@ npm run build
 
 ## Deploy
 
-Il progetto include un workflow GitHub Pages. Pubblicando il repository `sandropizzichelli/harmonic-intersections` su `main`, GitHub Actions costruisce l'app e la pubblica con base path `/harmonic-intersections/`.
+Il progetto e collegato a Vercel. Ogni push su `main` pubblica automaticamente la versione production:
+
+https://harmonic-intersections.vercel.app
