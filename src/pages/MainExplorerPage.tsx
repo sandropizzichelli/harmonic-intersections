@@ -6,7 +6,11 @@ import { FretboardLegend } from "../components/FretboardLegend";
 import { IntervalSelector } from "../components/IntervalSelector";
 import { MaterialComparisonPanel, type ActiveMaterialSummary } from "../components/MaterialComparisonPanel";
 import { SystemSelector, type MaterialMode } from "../components/SystemSelector";
-import { VisualizationSelector, type VisualizationMode } from "../components/VisualizationSelector";
+import {
+  VisualizationSelector,
+  type VisualizationLayer,
+  type VisualizationLayers
+} from "../components/VisualizationSelector";
 import type { ScaleId } from "../data/scales";
 import type { SpellingPreference } from "../data/noteNames";
 import { generateArpeggios, type ArpeggioType } from "../music/arpeggioGenerator";
@@ -17,6 +21,9 @@ import { generateScale } from "../music/scaleGenerator";
 const toSet = (items: PitchClass[]) => new Set(items);
 const keepRootsIn = (roots: PitchClass[], visibleNotes: Set<PitchClass>) =>
   toSet(roots.filter((root) => visibleNotes.has(root)));
+const withoutPitchClasses = (source: Set<PitchClass>, excluded: Set<PitchClass>) =>
+  new Set([...source].filter((pitchClass) => !excluded.has(pitchClass)));
+const unionPitchClasses = (...sets: Set<PitchClass>[]) => new Set(sets.flatMap((set) => [...set]));
 
 export function MainExplorerPage() {
   const [spelling, setSpelling] = useState<SpellingPreference>("flats");
@@ -24,7 +31,11 @@ export function MainExplorerPage() {
   const [scaleAId, setScaleAId] = useState<ScaleId>("ionian");
   const [intervalToB, setIntervalToB] = useState(8);
   const [scaleBId, setScaleBId] = useState<ScaleId>("ionian");
-  const [visualizationMode, setVisualizationMode] = useState<VisualizationMode>("common");
+  const [visualizationLayers, setVisualizationLayers] = useState<VisualizationLayers>({
+    notesA: true,
+    notesB: true,
+    common: true
+  });
   const [materialModeA, setMaterialModeA] = useState<MaterialMode>("scales");
   const [materialModeB, setMaterialModeB] = useState<MaterialMode>("scales");
   const [arpeggioTypeA, setArpeggioTypeA] = useState<ArpeggioType>("seventh");
@@ -84,12 +95,26 @@ export function MainExplorerPage() {
 
   const activeComparison = useMemo(() => compareMaterials(materialA.notes, materialB.notes), [materialA.notes, materialB.notes]);
 
+  const toggleVisualizationLayer = (layer: VisualizationLayer) => {
+    setVisualizationLayers((current) => ({
+      ...current,
+      [layer]: !current[layer]
+    }));
+  };
+
   const visualStates: PitchClassVisualState = useMemo(() => {
     const rootsA = [materialA.root];
     const rootsB = [materialB.root];
     const notesA = toSet(activeComparison.a);
     const notesB = toSet(activeComparison.b);
     const common = toSet(activeComparison.common);
+    const showCommon = visualizationLayers.common || (visualizationLayers.notesA && visualizationLayers.notesB);
+    const visibleCommon = showCommon ? common : new Set<PitchClass>();
+    const visibleOnlyA = visualizationLayers.notesA ? withoutPitchClasses(notesA, visibleCommon) : new Set<PitchClass>();
+    const visibleOnlyB = visualizationLayers.notesB ? withoutPitchClasses(notesB, visibleCommon) : new Set<PitchClass>();
+    const visibleAForRoots = unionPitchClasses(visibleOnlyA, visibleCommon);
+    const visibleBForRoots = unionPitchClasses(visibleOnlyB, visibleCommon);
+
     const base = {
       common: new Set<PitchClass>(),
       onlyA: new Set<PitchClass>(),
@@ -98,27 +123,15 @@ export function MainExplorerPage() {
       rootsB: new Set<PitchClass>()
     };
 
-    if (visualizationMode === "notesA") {
-      return {
-        ...base,
-        onlyA: notesA,
-        rootsA: keepRootsIn(rootsA, notesA)
-      };
-    }
-    if (visualizationMode === "notesB") {
-      return {
-        ...base,
-        onlyB: notesB,
-        rootsB: keepRootsIn(rootsB, notesB)
-      };
-    }
     return {
       ...base,
-      common,
-      rootsA: keepRootsIn(rootsA, common),
-      rootsB: keepRootsIn(rootsB, common)
+      common: visibleCommon,
+      onlyA: visibleOnlyA,
+      onlyB: visibleOnlyB,
+      rootsA: keepRootsIn(rootsA, visibleAForRoots),
+      rootsB: keepRootsIn(rootsB, visibleBForRoots)
     };
-  }, [activeComparison, materialA.root, materialB.root, visualizationMode]);
+  }, [activeComparison, materialA.root, materialB.root, visualizationLayers]);
 
   return (
     <main className="app-shell">
@@ -159,7 +172,7 @@ export function MainExplorerPage() {
         </div>
         <div className="stack">
           <DisplayPreferences spelling={spelling} onChange={setSpelling} />
-          <VisualizationSelector mode={visualizationMode} onChange={setVisualizationMode} />
+          <VisualizationSelector layers={visualizationLayers} onToggle={toggleVisualizationLayer} />
           <IntervalSelector interval={intervalToB} onChange={setIntervalToB} />
         </div>
       </div>

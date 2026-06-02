@@ -1,17 +1,19 @@
-export type VisualizationMode = "notesA" | "notesB" | "common";
+export type VisualizationLayer = "notesA" | "notesB" | "common";
 
-const VISUALIZATION_OPTIONS: { id: VisualizationMode; label: string }[] = [
+export type VisualizationLayers = Record<VisualizationLayer, boolean>;
+
+const VISUALIZATION_OPTIONS: { id: VisualizationLayer; label: string }[] = [
   { id: "notesA", label: "Note A" },
   { id: "notesB", label: "Note B" },
   { id: "common", label: "Note comuni" }
 ];
 
 type Props = {
-  mode: VisualizationMode;
-  onChange: (value: VisualizationMode) => void;
+  layers: VisualizationLayers;
+  onToggle: (value: VisualizationLayer) => void;
 };
 
-export function VisualizationSelector({ mode, onChange }: Props) {
+export function VisualizationSelector({ layers, onToggle }: Props) {
   return (
     <section className="panel">
       <div className="panel-title-row">
@@ -20,9 +22,10 @@ export function VisualizationSelector({ mode, onChange }: Props) {
       <div className="mode-grid three-buttons">
         {VISUALIZATION_OPTIONS.map((item) => (
           <button
-            className={mode === item.id ? "mode-button active" : "mode-button"}
+            aria-pressed={layers[item.id]}
+            className={layers[item.id] ? "mode-button active" : "mode-button"}
             key={item.id}
-            onClick={() => onChange(item.id)}
+            onClick={() => onToggle(item.id)}
           >
             {item.label}
           </button>
