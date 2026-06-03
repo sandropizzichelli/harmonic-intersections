@@ -6,6 +6,7 @@ import { FretboardLegend } from "../components/FretboardLegend";
 import { FretRangeSelector, type FretRange } from "../components/FretRangeSelector";
 import { IntervalSelector } from "../components/IntervalSelector";
 import { MaterialComparisonPanel, type ActiveMaterialSummary } from "../components/MaterialComparisonPanel";
+import { PresetResetPanel } from "../components/PresetResetPanel";
 import { SystemSelector, type MaterialMode } from "../components/SystemSelector";
 import {
   VisualizationSelector,
@@ -25,25 +26,27 @@ const keepRootsIn = (roots: PitchClass[], visibleNotes: Set<PitchClass>) =>
 const withoutPitchClasses = (source: Set<PitchClass>, excluded: Set<PitchClass>) =>
   new Set([...source].filter((pitchClass) => !excluded.has(pitchClass)));
 const unionPitchClasses = (...sets: Set<PitchClass>[]) => new Set(sets.flatMap((set) => [...set]));
+const DEFAULT_VISUALIZATION_LAYERS: VisualizationLayers = {
+  notesA: true,
+  notesB: true,
+  common: true
+};
+const DEFAULT_FRET_RANGE: FretRange = { start: 0, end: 12 };
 
 export function MainExplorerPage() {
   const [spelling, setSpelling] = useState<SpellingPreference>("flats");
   const [rootA, setRootA] = useState(0);
   const [scaleAId, setScaleAId] = useState<ScaleId>("ionian");
-  const [rootB, setRootB] = useState(8);
+  const [rootB, setRootB] = useState(0);
   const [scaleBId, setScaleBId] = useState<ScaleId>("ionian");
-  const [visualizationLayers, setVisualizationLayers] = useState<VisualizationLayers>({
-    notesA: true,
-    notesB: true,
-    common: true
-  });
+  const [visualizationLayers, setVisualizationLayers] = useState<VisualizationLayers>(DEFAULT_VISUALIZATION_LAYERS);
   const [materialModeA, setMaterialModeA] = useState<MaterialMode>("scales");
   const [materialModeB, setMaterialModeB] = useState<MaterialMode>("scales");
   const [arpeggioTypeA, setArpeggioTypeA] = useState<ArpeggioType>("seventh");
   const [arpeggioTypeB, setArpeggioTypeB] = useState<ArpeggioType>("seventh");
   const [selectedArpeggioA, setSelectedArpeggioA] = useState(0);
   const [selectedArpeggioB, setSelectedArpeggioB] = useState(0);
-  const [fretRange, setFretRange] = useState<FretRange>({ start: 0, end: 12 });
+  const [fretRange, setFretRange] = useState<FretRange>(DEFAULT_FRET_RANGE);
 
   const intervalToB = normalizePitchClass(rootB - rootA);
   const scaleA = useMemo(() => generateScale(rootA, scaleAId, spelling), [rootA, scaleAId, spelling]);
@@ -102,6 +105,22 @@ export function MainExplorerPage() {
       ...current,
       [layer]: !current[layer]
     }));
+  };
+
+  const resetPreset = () => {
+    setSpelling("flats");
+    setRootA(0);
+    setScaleAId("ionian");
+    setRootB(0);
+    setScaleBId("ionian");
+    setVisualizationLayers({ ...DEFAULT_VISUALIZATION_LAYERS });
+    setMaterialModeA("scales");
+    setMaterialModeB("scales");
+    setArpeggioTypeA("seventh");
+    setArpeggioTypeB("seventh");
+    setSelectedArpeggioA(0);
+    setSelectedArpeggioB(0);
+    setFretRange({ ...DEFAULT_FRET_RANGE });
   };
 
   const visualStates: PitchClassVisualState = useMemo(() => {
@@ -176,6 +195,7 @@ export function MainExplorerPage() {
           <VisualizationSelector layers={visualizationLayers} onToggle={toggleVisualizationLayer} />
           <IntervalSelector interval={intervalToB} />
           <FretRangeSelector range={fretRange} onChange={setFretRange} />
+          <PresetResetPanel onReset={resetPreset} />
         </div>
       </div>
 

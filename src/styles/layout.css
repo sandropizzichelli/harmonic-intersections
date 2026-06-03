@@ -134,7 +134,8 @@
 }
 
 .segmented-control button,
-.mode-button {
+.mode-button,
+.reset-button {
   min-height: 38px;
   border: 1px solid var(--border);
   border-radius: 6px;
@@ -142,6 +143,11 @@
   color: var(--ink);
   cursor: pointer;
   font-weight: 700;
+}
+
+.reset-button {
+  width: 100%;
+  min-height: 42px;
 }
 
 .segmented-control button.active,
