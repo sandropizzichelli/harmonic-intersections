@@ -3,7 +3,9 @@ const LEGEND_ITEMS = [
   { className: "only-a", label: "Solo A" },
   { className: "only-b", label: "Solo B" },
   { className: "root-a", label: "Tonica/Fond. A" },
-  { className: "root-b", label: "Tonica/Fond. B" }
+  { className: "root-b", label: "Tonica/Fond. B" },
+  { className: "common-root-a", label: "Comune + A" },
+  { className: "common-root-b", label: "Comune + B" }
 ];
 
 export function FretboardLegend() {
