@@ -2,10 +2,9 @@ import { INTERVAL_OPTIONS } from "../data/intervals";
 
 type Props = {
   interval: number;
-  onChange: (value: number) => void;
 };
 
-export function IntervalSelector({ interval, onChange }: Props) {
+export function IntervalSelector({ interval }: Props) {
   const activeInterval = INTERVAL_OPTIONS[interval];
 
   return (
@@ -14,14 +13,10 @@ export function IntervalSelector({ interval, onChange }: Props) {
         <h2>Distanza</h2>
       </div>
       <label className="field">
-        <span>Intervallo da A</span>
-        <select value={interval} onChange={(event) => onChange(Number(event.target.value))}>
-          {INTERVAL_OPTIONS.map((option) => (
-            <option value={option.semitones} key={option.semitones}>
-              +{option.semitones} semitoni / {option.label}
-            </option>
-          ))}
-        </select>
+        <span>Intervallo da A a B</span>
+        <output className="locked-value">
+          +{activeInterval.semitones} semitoni / {activeInterval.label}
+        </output>
       </label>
       <p className="inline-summary">
         +{activeInterval.semitones} semitoni / {activeInterval.label}

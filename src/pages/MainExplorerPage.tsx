@@ -15,7 +15,7 @@ import type { ScaleId } from "../data/scales";
 import type { SpellingPreference } from "../data/noteNames";
 import { generateArpeggios, type ArpeggioType } from "../music/arpeggioGenerator";
 import { compareMaterials } from "../music/intersectionAnalyzer";
-import { pitchClassName, transposePitchClass, type PitchClass } from "../music/pitchClass";
+import { normalizePitchClass, type PitchClass } from "../music/pitchClass";
 import { generateScale } from "../music/scaleGenerator";
 
 const toSet = (items: PitchClass[]) => new Set(items);
@@ -29,7 +29,7 @@ export function MainExplorerPage() {
   const [spelling, setSpelling] = useState<SpellingPreference>("flats");
   const [rootA, setRootA] = useState(0);
   const [scaleAId, setScaleAId] = useState<ScaleId>("ionian");
-  const [intervalToB, setIntervalToB] = useState(8);
+  const [rootB, setRootB] = useState(8);
   const [scaleBId, setScaleBId] = useState<ScaleId>("ionian");
   const [visualizationLayers, setVisualizationLayers] = useState<VisualizationLayers>({
     notesA: true,
@@ -43,7 +43,7 @@ export function MainExplorerPage() {
   const [selectedArpeggioA, setSelectedArpeggioA] = useState(0);
   const [selectedArpeggioB, setSelectedArpeggioB] = useState(0);
 
-  const rootB = transposePitchClass(rootA, intervalToB);
+  const intervalToB = normalizePitchClass(rootB - rootA);
   const scaleA = useMemo(() => generateScale(rootA, scaleAId, spelling), [rootA, scaleAId, spelling]);
   const scaleB = useMemo(() => generateScale(rootB, scaleBId, spelling), [rootB, scaleBId, spelling]);
   const arpeggiosA = useMemo(() => generateArpeggios(scaleA, spelling, "A", arpeggioTypeA), [scaleA, spelling, arpeggioTypeA]);
@@ -55,7 +55,7 @@ export function MainExplorerPage() {
 
   useEffect(() => {
     setSelectedArpeggioB(0);
-  }, [rootA, intervalToB, scaleBId, arpeggioTypeB]);
+  }, [rootB, scaleBId, arpeggioTypeB]);
 
   const materialA: ActiveMaterialSummary & { root: PitchClass } = useMemo(() => {
     const arpeggio = arpeggiosA[selectedArpeggioA];
@@ -162,8 +162,7 @@ export function MainExplorerPage() {
             arpeggioType={arpeggioTypeB}
             arpeggios={arpeggiosB}
             selectedArpeggio={selectedArpeggioB}
-            rootLocked
-            rootLabel={pitchClassName(rootB, spelling)}
+            onRootChange={setRootB}
             onScaleChange={setScaleBId}
             onMaterialModeChange={setMaterialModeB}
             onArpeggioTypeChange={setArpeggioTypeB}
@@ -173,7 +172,7 @@ export function MainExplorerPage() {
         <div className="stack">
           <DisplayPreferences spelling={spelling} onChange={setSpelling} />
           <VisualizationSelector layers={visualizationLayers} onToggle={toggleVisualizationLayer} />
-          <IntervalSelector interval={intervalToB} onChange={setIntervalToB} />
+          <IntervalSelector interval={intervalToB} />
         </div>
       </div>
 
