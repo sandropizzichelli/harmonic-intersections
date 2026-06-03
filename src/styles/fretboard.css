@@ -43,18 +43,6 @@
   border-color: var(--root-b);
 }
 
-.legend-dot.common-root-a {
-  background: var(--common);
-  border-color: white;
-  box-shadow: 0 0 0 2px var(--root-a);
-}
-
-.legend-dot.common-root-b {
-  background: var(--common);
-  border-color: white;
-  box-shadow: 0 0 0 2px var(--root-b);
-}
-
 .fretboard-panel {
   padding: 16px 14px 18px;
 }
@@ -161,11 +149,6 @@
   box-shadow: 0 6px 12px rgba(35, 33, 29, 0.12);
 }
 
-.fret-note::before,
-.fret-note::after {
-  pointer-events: none;
-}
-
 .fret-note.common {
   background: var(--common);
   color: white;
@@ -193,58 +176,4 @@
 
 .fret-note.root-a.root-b {
   box-shadow: 0 0 0 3px rgba(47, 111, 189, 0.24), 0 0 0 6px rgba(182, 101, 45, 0.18);
-}
-
-.fret-note.common.root-a {
-  border-color: white;
-  box-shadow:
-    0 0 0 3px rgba(23, 63, 138, 0.72),
-    0 0 0 6px rgba(45, 134, 86, 0.22),
-    0 8px 16px rgba(35, 33, 29, 0.18);
-}
-
-.fret-note.common.root-b {
-  border-color: white;
-  box-shadow:
-    0 0 0 3px rgba(141, 59, 21, 0.74),
-    0 0 0 6px rgba(45, 134, 86, 0.22),
-    0 8px 16px rgba(35, 33, 29, 0.18);
-}
-
-.fret-note.common.root-a.root-b {
-  box-shadow:
-    0 0 0 3px rgba(23, 63, 138, 0.72),
-    0 0 0 6px rgba(141, 59, 21, 0.46),
-    0 0 0 9px rgba(45, 134, 86, 0.2),
-    0 8px 16px rgba(35, 33, 29, 0.18);
-}
-
-.fret-note.common.root-a::before,
-.fret-note.common.root-b::after {
-  position: absolute;
-  top: -9px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 16px;
-  height: 16px;
-  border-radius: 50%;
-  background: white;
-  font-size: 0.55rem;
-  font-weight: 950;
-  line-height: 1;
-}
-
-.fret-note.common.root-a::before {
-  left: -8px;
-  border: 2px solid var(--root-a);
-  color: var(--root-a);
-  content: "A";
-}
-
-.fret-note.common.root-b::after {
-  right: -8px;
-  border: 2px solid var(--root-b);
-  color: var(--root-b);
-  content: "B";
 }
