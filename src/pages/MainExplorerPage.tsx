@@ -3,6 +3,7 @@ import { AppHeader } from "../components/AppHeader";
 import { DisplayPreferences } from "../components/DisplayPreferences";
 import { Fretboard, type PitchClassVisualState } from "../components/Fretboard";
 import { FretboardLegend } from "../components/FretboardLegend";
+import { FretRangeSelector, type FretRange } from "../components/FretRangeSelector";
 import { IntervalSelector } from "../components/IntervalSelector";
 import { MaterialComparisonPanel, type ActiveMaterialSummary } from "../components/MaterialComparisonPanel";
 import { SystemSelector, type MaterialMode } from "../components/SystemSelector";
@@ -42,6 +43,7 @@ export function MainExplorerPage() {
   const [arpeggioTypeB, setArpeggioTypeB] = useState<ArpeggioType>("seventh");
   const [selectedArpeggioA, setSelectedArpeggioA] = useState(0);
   const [selectedArpeggioB, setSelectedArpeggioB] = useState(0);
+  const [fretRange, setFretRange] = useState<FretRange>({ start: 0, end: 12 });
 
   const intervalToB = normalizePitchClass(rootB - rootA);
   const scaleA = useMemo(() => generateScale(rootA, scaleAId, spelling), [rootA, scaleAId, spelling]);
@@ -173,12 +175,13 @@ export function MainExplorerPage() {
           <DisplayPreferences spelling={spelling} onChange={setSpelling} />
           <VisualizationSelector layers={visualizationLayers} onToggle={toggleVisualizationLayer} />
           <IntervalSelector interval={intervalToB} />
+          <FretRangeSelector range={fretRange} onChange={setFretRange} />
         </div>
       </div>
 
       <div className="fretboard-block">
         <FretboardLegend />
-        <Fretboard states={visualStates} spelling={spelling} />
+        <Fretboard states={visualStates} spelling={spelling} fretRange={fretRange} />
       </div>
 
       <MaterialComparisonPanel materialA={materialA} materialB={materialB} comparison={activeComparison} spelling={spelling} />

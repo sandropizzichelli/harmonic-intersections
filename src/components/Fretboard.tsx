@@ -2,6 +2,7 @@ import { buildFretboard } from "../music/fretboardMapper";
 import { pitchClassName, type PitchClass } from "../music/pitchClass";
 import type { SpellingPreference } from "../data/noteNames";
 import type { CSSProperties } from "react";
+import type { FretRange } from "./FretRangeSelector";
 
 export type PitchClassVisualState = {
   common: Set<PitchClass>;
@@ -14,6 +15,7 @@ export type PitchClassVisualState = {
 type Props = {
   states: PitchClassVisualState;
   spelling: SpellingPreference;
+  fretRange: FretRange;
   fretCount?: number;
 };
 
@@ -27,7 +29,7 @@ const stateClassFor = (pitchClass: PitchClass, states: PitchClassVisualState) =>
   return classes.join(" ");
 };
 
-export function Fretboard({ states, spelling, fretCount = 12 }: Props) {
+export function Fretboard({ states, spelling, fretRange, fretCount = 12 }: Props) {
   const strings = buildFretboard(fretCount);
   const activePitchClasses = new Set([
     ...states.common,
@@ -52,18 +54,26 @@ export function Fretboard({ states, spelling, fretCount = 12 }: Props) {
           {strings.map((string) => (
             <div className="string-row" key={string[0].stringNumber}>
               <span className="string-label">{string[0].stringName}</span>
-              {string.map((position) => (
-                <div
-                  className={position.fret === 0 ? "fret-cell open-string-cell" : "fret-cell"}
-                  key={`${position.stringNumber}-${position.fret}`}
-                >
-                  {activePitchClasses.has(position.pitchClass) ? (
+              {string.map((position) => {
+                const isInRange = position.fret >= fretRange.start && position.fret <= fretRange.end;
+                const cellClasses = [
+                  "fret-cell",
+                  position.fret === 0 ? "open-string-cell" : "",
+                  isInRange ? "in-range" : "out-of-range"
+                ]
+                  .filter(Boolean)
+                  .join(" ");
+
+                return (
+                  <div className={cellClasses} key={`${position.stringNumber}-${position.fret}`}>
+                    {isInRange && activePitchClasses.has(position.pitchClass) ? (
                     <span className={stateClassFor(position.pitchClass, states)}>
                       {pitchClassName(position.pitchClass, spelling)}
                     </span>
-                  ) : null}
-                </div>
-              ))}
+                    ) : null}
+                  </div>
+                );
+              })}
             </div>
           ))}
         </div>

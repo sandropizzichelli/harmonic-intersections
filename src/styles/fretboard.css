@@ -106,6 +106,16 @@
     linear-gradient(90deg, rgba(255, 255, 255, 0.55), rgba(255, 255, 255, 0));
 }
 
+.fret-cell.out-of-range {
+  opacity: 0.34;
+}
+
+.fret-cell.in-range {
+  background:
+    linear-gradient(#5b5146, #5b5146) center / 100% 2px no-repeat,
+    linear-gradient(90deg, rgba(255, 255, 255, 0.62), rgba(255, 255, 255, 0.08));
+}
+
 .open-string-cell {
   border-right: 8px solid #77736d;
   background:
