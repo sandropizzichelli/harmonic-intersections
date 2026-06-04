@@ -19,6 +19,14 @@ type Props = {
   fretCount?: number;
 };
 
+const FRET_MARKERS = [
+  { fret: 3, type: "single" },
+  { fret: 5, type: "single" },
+  { fret: 7, type: "single" },
+  { fret: 9, type: "single" },
+  { fret: 12, type: "double" }
+];
+
 const stateClassFor = (pitchClass: PitchClass, states: PitchClassVisualState) => {
   const classes = ["fret-note"];
   if (states.common.has(pitchClass)) classes.push("common");
@@ -51,6 +59,23 @@ export function Fretboard({ states, spelling, fretRange, fretCount = 12 }: Props
       </div>
       <div className="fretboard-scroll">
         <div className="fretboard" style={{ "--fret-count": fretCount + 1 } as CSSProperties}>
+          <div className="fret-markers" aria-hidden="true">
+            {Array.from({ length: fretCount + 1 }, (_, fret) => {
+              const marker = FRET_MARKERS.find((item) => item.fret === fret);
+              return (
+                <span className={marker ? `fret-marker ${marker.type}` : "fret-marker empty"} key={fret}>
+                  {marker?.type === "double" ? (
+                    <>
+                      <span />
+                      <span />
+                    </>
+                  ) : marker ? (
+                    <span />
+                  ) : null}
+                </span>
+              );
+            })}
+          </div>
           {strings.map((string) => (
             <div className="string-row" key={string[0].stringNumber}>
               <span className="string-label">{string[0].stringName}</span>
