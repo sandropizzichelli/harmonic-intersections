@@ -23,7 +23,7 @@ export function FretRangeSelector({ range, maxFret = 12, onChange }: Props) {
   return (
     <section className="panel">
       <div className="panel-title-row">
-        <h2>Zona manico</h2>
+        <h2>Fret range</h2>
       </div>
       <div className="mode-grid fret-range-presets">
         {PRESETS.map((preset) => (
@@ -38,7 +38,7 @@ export function FretRangeSelector({ range, maxFret = 12, onChange }: Props) {
       </div>
       <div className="range-control-grid">
         <label className="field small-field">
-          <span>Da tasto</span>
+          <span>From fret</span>
           <select
             value={range.start}
             onChange={(event) => {
@@ -54,7 +54,7 @@ export function FretRangeSelector({ range, maxFret = 12, onChange }: Props) {
           </select>
         </label>
         <label className="field small-field">
-          <span>A tasto</span>
+          <span>To fret</span>
           <select
             value={range.end}
             onChange={(event) => {

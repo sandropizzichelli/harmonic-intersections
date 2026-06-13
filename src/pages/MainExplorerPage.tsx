@@ -181,7 +181,7 @@ export function MainExplorerPage() {
       <AppHeader />
       <div className="top-grid">
         <SystemSelector
-          title="Sistema A"
+          title="System A"
           root={rootA}
           scaleId={scaleAId}
           scale={scaleA}
@@ -199,7 +199,7 @@ export function MainExplorerPage() {
         />
         <div className="stack">
           <SystemSelector
-            title="Sistema B"
+            title="System B"
             root={rootB}
             scaleId={scaleBId}
             scale={scaleB}

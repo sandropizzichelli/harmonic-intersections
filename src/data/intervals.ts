@@ -1,16 +1,16 @@
 export const INTERVAL_LABELS = [
-  "unisono",
-  "seconda minore",
-  "seconda maggiore",
-  "terza minore",
-  "terza maggiore",
-  "quarta giusta",
-  "tritono",
-  "quinta giusta",
-  "sesta minore",
-  "sesta maggiore",
-  "settima minore",
-  "settima maggiore"
+  "unison",
+  "minor second",
+  "major second",
+  "minor third",
+  "major third",
+  "perfect fourth",
+  "tritone",
+  "perfect fifth",
+  "minor sixth",
+  "major sixth",
+  "minor seventh",
+  "major seventh"
 ];
 
 export const INTERVAL_OPTIONS = INTERVAL_LABELS.map((label, semitones) => ({

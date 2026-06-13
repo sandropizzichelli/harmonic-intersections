@@ -6,11 +6,11 @@ import type { SpellingPreference } from "../data/noteNames";
 export type ArpeggioType = "triad" | "seventh" | "ninth" | "eleventh" | "thirteenth";
 
 export const ARPEGGIO_TYPE_OPTIONS: { id: ArpeggioType; label: string }[] = [
-  { id: "triad", label: "Triade" },
-  { id: "seventh", label: "Settima diatonica" },
-  { id: "ninth", label: "9 diatonica" },
-  { id: "eleventh", label: "11 diatonica" },
-  { id: "thirteenth", label: "13 diatonica" }
+  { id: "triad", label: "Triad" },
+  { id: "seventh", label: "Diatonic seventh" },
+  { id: "ninth", label: "Diatonic ninth" },
+  { id: "eleventh", label: "Diatonic eleventh" },
+  { id: "thirteenth", label: "Diatonic thirteenth" }
 ];
 
 const DIATONIC_OFFSETS: Record<ArpeggioType, number[]> = {

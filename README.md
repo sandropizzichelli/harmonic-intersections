@@ -1,15 +1,15 @@
 # Harmonic Intersections
 
-Web app autonoma per esplorare intersezioni fra sistemi armonico-modali sulla tastiera della chitarra.
+Standalone web app for exploring intersections between harmonic-modal systems on the guitar fretboard.
 
-## Sviluppo
+## Development
 
 ```bash
 npm install
 npm run dev
 ```
 
-## Verifica
+## Verification
 
 ```bash
 npm test
@@ -18,6 +18,6 @@ npm run build
 
 ## Deploy
 
-Il progetto e collegato a Vercel. Ogni push su `main` pubblica automaticamente la versione production:
+The project is connected to Vercel. Every push to `main` automatically publishes the production version:
 
 https://harmonic-intersections.vercel.app

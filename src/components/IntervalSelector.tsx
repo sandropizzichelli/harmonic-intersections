@@ -10,16 +10,16 @@ export function IntervalSelector({ interval }: Props) {
   return (
     <section className="panel">
       <div className="panel-title-row">
-        <h2>Distanza</h2>
+        <h2>Distance</h2>
       </div>
       <label className="field">
-        <span>Intervallo da A a B</span>
+        <span>Interval from A to B</span>
         <output className="locked-value">
-          +{activeInterval.semitones} semitoni / {activeInterval.label}
+          +{activeInterval.semitones} semitones / {activeInterval.label}
         </output>
       </label>
       <p className="inline-summary">
-        +{activeInterval.semitones} semitoni / {activeInterval.label}
+        +{activeInterval.semitones} semitones / {activeInterval.label}
       </p>
     </section>
   );

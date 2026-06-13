@@ -66,7 +66,7 @@ export function Fretboard({
   return (
     <section className="panel fretboard-panel">
       <div className="fretboard-header">
-        <h2>Tastiera</h2>
+        <h2>Fretboard</h2>
         <div className="fret-numbers" style={{ "--fret-count": fretCount + 1 } as CSSProperties}>
           {Array.from({ length: fretCount + 1 }, (_, fret) => (
             <span key={fret}>{fret}</span>

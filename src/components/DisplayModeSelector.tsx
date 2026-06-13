@@ -9,14 +9,14 @@ export function DisplayModeSelector({ mode, onChange }: Props) {
   return (
     <section className="panel compact-panel">
       <div className="panel-title-row">
-        <h2>Visualizza</h2>
+        <h2>Display</h2>
       </div>
       <div className="segmented-control">
         <button className={mode === "notes" ? "active" : ""} onClick={() => onChange("notes")}>
-          Note
+          Notes
         </button>
         <button className={mode === "degrees" ? "active" : ""} onClick={() => onChange("degrees")}>
-          Gradi
+          Degrees
         </button>
       </div>
     </section>

@@ -6,7 +6,7 @@ export function AppHeader() {
         <h1>Harmonic Intersections</h1>
       </div>
       <p className="header-copy">
-        Esplora sovrapposizioni, divergenze e note-pivot tra due sistemi armonico-modali sulla chitarra.
+        Explore overlaps, divergences, and pivot notes between two harmonic-modal systems on the guitar.
       </p>
     </header>
   );

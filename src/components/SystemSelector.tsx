@@ -65,7 +65,7 @@ export function SystemSelector({
         <h2>{title}</h2>
       </div>
       <label className="field">
-        <span>Tonica</span>
+        <span>Tonic</span>
         {rootLocked ? (
           <output className="locked-value">{rootLabel}</output>
         ) : (
@@ -79,7 +79,7 @@ export function SystemSelector({
         )}
       </label>
       <label className="field">
-        <span>Modo</span>
+        <span>Mode</span>
         <select value={scaleId} onChange={(event) => onScaleChange(event.target.value as ScaleId)}>
           {SCALE_FAMILIES.map((family) => (
             <optgroup label={family.label} key={family.id}>
@@ -94,7 +94,7 @@ export function SystemSelector({
       </label>
       <div className="segmented-control material-toggle">
         <button className={materialMode === "scales" ? "active" : ""} onClick={() => onMaterialModeChange("scales")}>
-          Scala completa
+          Full scale
         </button>
         <button className={materialMode === "arpeggios" ? "active" : ""} onClick={() => onMaterialModeChange("arpeggios")}>
           Arpeggio
@@ -103,7 +103,7 @@ export function SystemSelector({
       {materialMode === "arpeggios" ? (
         <>
           <label className="field material-field">
-            <span>Tipo arpeggio</span>
+            <span>Arpeggio type</span>
             <select value={arpeggioType} onChange={(event) => onArpeggioTypeChange(event.target.value as ArpeggioType)}>
               {ARPEGGIO_TYPE_OPTIONS.map((option) => (
                 <option value={option.id} key={option.id}>
@@ -113,7 +113,7 @@ export function SystemSelector({
             </select>
           </label>
           <label className="field">
-            <span>Grado</span>
+            <span>Degree</span>
             <select value={selectedArpeggio} onChange={(event) => onSelectedArpeggioChange(Number(event.target.value))}>
               {arpeggios.map((arpeggio, index) => (
                 <option value={index} key={arpeggio.id}>
@@ -128,11 +128,11 @@ export function SystemSelector({
         label={
           displayMode === "degrees"
             ? materialMode === "arpeggios"
-              ? "Gradi arpeggio"
-              : "Gradi scala"
+              ? "Arpeggio degrees"
+              : "Scale degrees"
             : materialMode === "arpeggios"
-              ? "Note arpeggio"
-              : "Note scala"
+              ? "Arpeggio notes"
+              : "Scale notes"
         }
         notes={activeNotes}
       />

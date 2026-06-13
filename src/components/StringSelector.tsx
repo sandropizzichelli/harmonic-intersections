@@ -14,9 +14,9 @@ export function StringSelector({ activeStrings, onToggle, onSelectAll }: Props) 
   return (
     <section className="panel">
       <div className="panel-title-row">
-        <h2>Corde</h2>
+        <h2>Strings</h2>
         <button className="panel-action-button" disabled={allStringsActive} onClick={onSelectAll}>
-          Tutte
+          All
         </button>
       </div>
       <div className="mode-grid string-selector">

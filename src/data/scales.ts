@@ -56,9 +56,9 @@ export const SCALE_PATTERNS: Record<ScaleId, number[]> = {
 };
 
 export const SCALE_FAMILIES: { id: ScaleFamilyId; label: string }[] = [
-  { id: "majorModes", label: "Modi della maggiore" },
-  { id: "melodicMinorModes", label: "Modi della minore melodica" },
-  { id: "harmonicMinorModes", label: "Modi della minore armonica" }
+  { id: "majorModes", label: "Major scale modes" },
+  { id: "melodicMinorModes", label: "Melodic minor modes" },
+  { id: "harmonicMinorModes", label: "Harmonic minor modes" }
 ];
 
 export const SCALES: ScaleDefinition[] = [

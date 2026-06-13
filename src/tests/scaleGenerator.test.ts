@@ -30,9 +30,9 @@ describe("scale generation and intersections", () => {
 describe("scale families", () => {
   it("separates major, melodic minor, and harmonic minor modal systems", () => {
     expect(SCALE_FAMILIES.map((family) => family.label)).toEqual([
-      "Modi della maggiore",
-      "Modi della minore melodica",
-      "Modi della minore armonica"
+      "Major scale modes",
+      "Melodic minor modes",
+      "Harmonic minor modes"
     ]);
     expect(SCALES.filter((scale) => scale.family === "majorModes")).toHaveLength(7);
     expect(SCALES.filter((scale) => scale.family === "melodicMinorModes")).toHaveLength(7);
