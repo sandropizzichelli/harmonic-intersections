@@ -260,6 +260,31 @@
   margin-top: 14px;
 }
 
+.interval-data-panel {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+}
+
+.interval-data-heading {
+  display: grid;
+  gap: 4px;
+}
+
+.interval-data-heading span {
+  color: var(--text-muted);
+  font-size: 0.7rem;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.interval-data-value {
+  color: var(--ink);
+  font-size: 1rem;
+  font-weight: 800;
+}
+
 .comparison-header {
   align-items: flex-start;
   border-bottom: 1px solid var(--border);
@@ -429,6 +454,12 @@
   .app-shell {
     width: min(100% - 18px, 1500px);
     padding-top: 18px;
+  }
+
+  .interval-data-panel {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 10px;
   }
 
   .string-selector {

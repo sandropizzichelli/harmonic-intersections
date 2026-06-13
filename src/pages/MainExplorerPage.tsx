@@ -229,7 +229,6 @@ export function MainExplorerPage() {
         <div className="stack">
           <DisplayModeSelector mode={displayMode} onChange={setDisplayMode} />
           <VisualizationSelector layers={visualizationLayers} onToggle={toggleVisualizationLayer} />
-          <IntervalSelector interval={intervalToB} />
           <FretRangeSelector range={fretRange} onChange={setFretRange} />
           <StringSelector
             activeStrings={activeStrings}
@@ -252,6 +251,8 @@ export function MainExplorerPage() {
           activeStrings={activeStrings}
         />
       </div>
+
+      <IntervalSelector interval={intervalToB} />
 
       <MaterialComparisonPanel
         materialA={materialA}

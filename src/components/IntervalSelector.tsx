@@ -8,19 +8,14 @@ export function IntervalSelector({ interval }: Props) {
   const activeInterval = INTERVAL_OPTIONS[interval];
 
   return (
-    <section className="panel">
-      <div className="panel-title-row">
+    <section className="panel interval-data-panel">
+      <div className="interval-data-heading">
         <h2>Distance</h2>
-      </div>
-      <label className="field">
         <span>Interval from A to B</span>
-        <output className="locked-value">
-          +{activeInterval.semitones} semitones / {activeInterval.label}
-        </output>
-      </label>
-      <p className="inline-summary">
+      </div>
+      <output className="interval-data-value">
         +{activeInterval.semitones} semitones / {activeInterval.label}
-      </p>
+      </output>
     </section>
   );
 }
