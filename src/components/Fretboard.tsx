@@ -6,18 +6,17 @@ import { combinedDegreeLabel, type DegreeLabels } from "../music/degreeLabels";
 import type { DisplayMode } from "./DisplayModeSelector";
 import type { FretRange } from "./FretRangeSelector";
 import type { ActiveStrings } from "./StringSelector";
-import type { VisualizationLayers } from "./VisualizationSelector";
-import type { CagedPosition } from "../music/cagedPositions";
-import { fretPositionVisualState } from "../music/fretboardVisibility";
+
+export type PitchClassVisualState = {
+  common: Set<PitchClass>;
+  onlyA: Set<PitchClass>;
+  onlyB: Set<PitchClass>;
+  rootsA: Set<PitchClass>;
+  rootsB: Set<PitchClass>;
+};
 
 type Props = {
-  notesA: PitchClass[];
-  notesB: PitchClass[];
-  rootA: PitchClass;
-  rootB: PitchClass;
-  visualizationLayers: VisualizationLayers;
-  cagedPositionA: CagedPosition | null;
-  cagedPositionB: CagedPosition | null;
+  states: PitchClassVisualState;
   spelling: SpellingPreference;
   displayMode: DisplayMode;
   degreeLabelsA: DegreeLabels;
@@ -35,30 +34,18 @@ const FRET_MARKERS = [
   { fret: 12, type: "double" }
 ];
 
-const stateClassFor = (
-  isCommon: boolean,
-  isOnlyA: boolean,
-  isOnlyB: boolean,
-  isRootA: boolean,
-  isRootB: boolean
-) => {
+const stateClassFor = (pitchClass: PitchClass, states: PitchClassVisualState) => {
   const classes = ["fret-note"];
-  if (isCommon) classes.push("common");
-  if (isOnlyA) classes.push("only-a");
-  if (isOnlyB) classes.push("only-b");
-  if (isRootA) classes.push("root-a");
-  if (isRootB) classes.push("root-b");
+  if (states.common.has(pitchClass)) classes.push("common");
+  if (states.onlyA.has(pitchClass)) classes.push("only-a");
+  if (states.onlyB.has(pitchClass)) classes.push("only-b");
+  if (states.rootsA.has(pitchClass)) classes.push("root-a");
+  if (states.rootsB.has(pitchClass)) classes.push("root-b");
   return classes.join(" ");
 };
 
 export function Fretboard({
-  notesA,
-  notesB,
-  rootA,
-  rootB,
-  visualizationLayers,
-  cagedPositionA,
-  cagedPositionB,
+  states,
   spelling,
   displayMode,
   degreeLabelsA,
@@ -68,8 +55,13 @@ export function Fretboard({
   fretCount = 12
 }: Props) {
   const strings = buildFretboard(fretCount);
-  const pitchClassesA = new Set(notesA);
-  const pitchClassesB = new Set(notesB);
+  const activePitchClasses = new Set([
+    ...states.common,
+    ...states.onlyA,
+    ...states.onlyB,
+    ...states.rootsA,
+    ...states.rootsB
+  ]);
 
   return (
     <section className="panel fretboard-panel">
@@ -112,17 +104,6 @@ export function Fretboard({
               </span>
               {string.map((position) => {
                 const isInRange = position.fret >= fretRange.start && position.fret <= fretRange.end;
-                const visualState = fretPositionVisualState({
-                  pitchClass: position.pitchClass,
-                  fret: position.fret,
-                  pitchClassesA,
-                  pitchClassesB,
-                  rootA,
-                  rootB,
-                  layers: visualizationLayers,
-                  cagedPositionA,
-                  cagedPositionB
-                });
                 const cellClasses = [
                   "fret-cell",
                   position.fret === 0 ? "open-string-cell" : "",
@@ -130,24 +111,14 @@ export function Fretboard({
                 ]
                   .filter(Boolean)
                   .join(" ");
+                const belongsToA = states.common.has(position.pitchClass) || states.onlyA.has(position.pitchClass);
+                const belongsToB = states.common.has(position.pitchClass) || states.onlyB.has(position.pitchClass);
                 const noteLabel =
                   displayMode === "degrees"
-                    ? combinedDegreeLabel(
-                        position.pitchClass,
-                        degreeLabelsA,
-                        degreeLabelsB,
-                        visualState.visibleToA,
-                        visualState.visibleToB
-                      )
+                    ? combinedDegreeLabel(position.pitchClass, degreeLabelsA, degreeLabelsB, belongsToA, belongsToB)
                     : pitchClassName(position.pitchClass, spelling);
                 const noteClasses = [
-                  stateClassFor(
-                    visualState.isCommon,
-                    visualState.isOnlyA,
-                    visualState.isOnlyB,
-                    visualState.isRootA,
-                    visualState.isRootB
-                  ),
+                  stateClassFor(position.pitchClass, states),
                   displayMode === "degrees" ? "degree-label" : "",
                   noteLabel.includes("/") ? "dual-degree-label" : ""
                 ]
@@ -156,7 +127,7 @@ export function Fretboard({
 
                 return (
                   <div className={cellClasses} key={`${position.stringNumber}-${position.fret}`}>
-                    {isStringActive && isInRange && visualState.isVisible ? (
+                    {isStringActive && isInRange && activePitchClasses.has(position.pitchClass) ? (
                     <span className={noteClasses}>{noteLabel}</span>
                     ) : null}
                   </div>
