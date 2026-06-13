@@ -56,28 +56,38 @@ export function MaterialComparisonPanel({
 
   return (
     <section className="panel analysis-panel">
-      <div className="panel-title-row">
+      <div className="panel-title-row comparison-header">
         <h2>Confronto</h2>
-        <span className="score-badge">
-          {comparison.commonCount} note comuni su {denominator}
-        </span>
+        <div className="overlap-summary">
+          <strong>{comparison.overlapPercent}%</strong>
+          <span>
+            {comparison.commonCount} {displayMode === "degrees" ? "gradi" : "note"} comuni su {denominator}
+          </span>
+        </div>
       </div>
-      <div className="comparison-columns">
-        <div>
+      <div className="comparison-materials">
+        <div className="comparison-material system-a-material">
+          <span className="comparison-system-label">Sistema A</span>
           <h3>{materialA.label}</h3>
           <NoteChips notes={labelsA} />
         </div>
-        <div>
+        <div className="comparison-material system-b-material">
+          <span className="comparison-system-label">Sistema B</span>
           <h3>{materialB.label}</h3>
           <NoteChips notes={labelsB} />
         </div>
       </div>
-      <div className="result-grid">
-        <NoteChips label={displayMode === "degrees" ? "Gradi comuni A/B" : "Note comuni"} notes={commonLabels} tone="common" />
-        <NoteChips label={displayMode === "degrees" ? "Solo gradi Sistema A" : "Solo Sistema A"} notes={onlyALabels} tone="only-a" />
-        <NoteChips label={displayMode === "degrees" ? "Solo gradi Sistema B" : "Solo Sistema B"} notes={onlyBLabels} tone="only-b" />
+      <div className="comparison-breakdown">
+        <div className="comparison-result common-result">
+          <NoteChips label={displayMode === "degrees" ? "Gradi comuni A/B" : "Note comuni"} notes={commonLabels} tone="common" />
+        </div>
+        <div className="comparison-result only-a-result">
+          <NoteChips label={displayMode === "degrees" ? "Solo gradi Sistema A" : "Solo Sistema A"} notes={onlyALabels} tone="only-a" />
+        </div>
+        <div className="comparison-result only-b-result">
+          <NoteChips label={displayMode === "degrees" ? "Solo gradi Sistema B" : "Solo Sistema B"} notes={onlyBLabels} tone="only-b" />
+        </div>
       </div>
-      <p className="inline-summary">Sovrapposizione: {comparison.overlapPercent}%</p>
     </section>
   );
 }
