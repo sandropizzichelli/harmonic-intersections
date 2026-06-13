@@ -35,6 +35,11 @@ export const buildDegreeLabelsFromScaleDegree = (
   startingDegree: number
 ): DegreeLabels => buildDegreeLabels(rotateScaleNotes(scaleNotes, startingDegree));
 
+export const buildDegreeLabelsFromPitchClasses = (
+  pitchClasses: PitchClass[],
+  labels: string[]
+): DegreeLabels => new Map(pitchClasses.map((pitchClass, index) => [pitchClass, labels[index] ?? "–"]));
+
 export const labelsForPitchClasses = (pitchClasses: PitchClass[], degreeLabels: DegreeLabels): string[] =>
   pitchClasses.map((pitchClass) => degreeLabels.get(pitchClass) ?? "–");
 

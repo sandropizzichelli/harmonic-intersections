@@ -17,10 +17,14 @@ import {
 import type { ScaleId } from "../data/scales";
 import type { SpellingPreference } from "../data/noteNames";
 import { generateArpeggios, type ArpeggioType } from "../music/arpeggioGenerator";
-import { buildDegreeLabelsFromScaleDegree } from "../music/degreeLabels";
+import {
+  buildDegreeLabelsFromPitchClasses,
+  buildDegreeLabelsFromScaleDegree
+} from "../music/degreeLabels";
 import { compareMaterials } from "../music/intersectionAnalyzer";
 import { normalizePitchClass, type PitchClass } from "../music/pitchClass";
 import { STANDARD_TUNING } from "../music/fretboardMapper";
+import { generatePentatonics, type PentatonicType } from "../music/pentatonicGenerator";
 import { generateScale } from "../music/scaleGenerator";
 
 const toSet = (items: PitchClass[]) => new Set(items);
@@ -52,6 +56,10 @@ export function MainExplorerPage() {
   const [arpeggioTypeB, setArpeggioTypeB] = useState<ArpeggioType>("seventh");
   const [selectedArpeggioA, setSelectedArpeggioA] = useState(0);
   const [selectedArpeggioB, setSelectedArpeggioB] = useState(0);
+  const [pentatonicTypeA, setPentatonicTypeA] = useState<PentatonicType>("major");
+  const [pentatonicTypeB, setPentatonicTypeB] = useState<PentatonicType>("major");
+  const [selectedPentatonicA, setSelectedPentatonicA] = useState(0);
+  const [selectedPentatonicB, setSelectedPentatonicB] = useState(0);
   const [fretRange, setFretRange] = useState<FretRange>(DEFAULT_FRET_RANGE);
   const [activeStrings, setActiveStrings] = useState<ActiveStrings>(allStrings);
 
@@ -60,17 +68,33 @@ export function MainExplorerPage() {
   const scaleB = useMemo(() => generateScale(rootB, scaleBId, spelling), [rootB, scaleBId, spelling]);
   const arpeggiosA = useMemo(() => generateArpeggios(scaleA, spelling, "A", arpeggioTypeA), [scaleA, spelling, arpeggioTypeA]);
   const arpeggiosB = useMemo(() => generateArpeggios(scaleB, spelling, "B", arpeggioTypeB), [scaleB, spelling, arpeggioTypeB]);
+  const pentatonicsA = useMemo(
+    () => generatePentatonics(scaleA, spelling, "A", pentatonicTypeA),
+    [pentatonicTypeA, scaleA, spelling]
+  );
+  const pentatonicsB = useMemo(
+    () => generatePentatonics(scaleB, spelling, "B", pentatonicTypeB),
+    [pentatonicTypeB, scaleB, spelling]
+  );
   const degreeReferenceA =
     materialModeA === "arpeggios" ? arpeggiosA[selectedArpeggioA]?.degree ?? 0 : 0;
   const degreeReferenceB =
     materialModeB === "arpeggios" ? arpeggiosB[selectedArpeggioB]?.degree ?? 0 : 0;
+  const activePentatonicA = pentatonicsA[selectedPentatonicA];
+  const activePentatonicB = pentatonicsB[selectedPentatonicB];
   const degreeLabelsA = useMemo(
-    () => buildDegreeLabelsFromScaleDegree(scaleA.notes, degreeReferenceA),
-    [degreeReferenceA, scaleA.notes]
+    () =>
+      materialModeA === "pentatonics" && activePentatonicA
+        ? buildDegreeLabelsFromPitchClasses(activePentatonicA.notes, activePentatonicA.degreeLabels)
+        : buildDegreeLabelsFromScaleDegree(scaleA.notes, degreeReferenceA),
+    [activePentatonicA, degreeReferenceA, materialModeA, scaleA.notes]
   );
   const degreeLabelsB = useMemo(
-    () => buildDegreeLabelsFromScaleDegree(scaleB.notes, degreeReferenceB),
-    [degreeReferenceB, scaleB.notes]
+    () =>
+      materialModeB === "pentatonics" && activePentatonicB
+        ? buildDegreeLabelsFromPitchClasses(activePentatonicB.notes, activePentatonicB.degreeLabels)
+        : buildDegreeLabelsFromScaleDegree(scaleB.notes, degreeReferenceB),
+    [activePentatonicB, degreeReferenceB, materialModeB, scaleB.notes]
   );
 
   useEffect(() => {
@@ -80,6 +104,14 @@ export function MainExplorerPage() {
   useEffect(() => {
     setSelectedArpeggioB(0);
   }, [rootB, scaleBId, arpeggioTypeB]);
+
+  useEffect(() => {
+    setSelectedPentatonicA(0);
+  }, [rootA, scaleAId, pentatonicTypeA]);
+
+  useEffect(() => {
+    setSelectedPentatonicB(0);
+  }, [rootB, scaleBId, pentatonicTypeB]);
 
   const materialA: ActiveMaterialSummary & { root: PitchClass } = useMemo(() => {
     const arpeggio = arpeggiosA[selectedArpeggioA];
@@ -91,13 +123,21 @@ export function MainExplorerPage() {
         root: arpeggio.root
       };
     }
+    if (materialModeA === "pentatonics" && activePentatonicA) {
+      return {
+        label: `${activePentatonicA.roman} ${activePentatonicA.name}`,
+        notes: activePentatonicA.notes,
+        noteNames: activePentatonicA.noteNames,
+        root: activePentatonicA.root
+      };
+    }
     return {
       label: `${scaleA.noteNames[0]} ${scaleA.label}`,
       notes: scaleA.notes,
       noteNames: scaleA.noteNames,
       root: rootA
     };
-  }, [arpeggiosA, materialModeA, rootA, scaleA, selectedArpeggioA]);
+  }, [activePentatonicA, arpeggiosA, materialModeA, rootA, scaleA, selectedArpeggioA]);
 
   const materialB: ActiveMaterialSummary & { root: PitchClass } = useMemo(() => {
     const arpeggio = arpeggiosB[selectedArpeggioB];
@@ -109,13 +149,21 @@ export function MainExplorerPage() {
         root: arpeggio.root
       };
     }
+    if (materialModeB === "pentatonics" && activePentatonicB) {
+      return {
+        label: `${activePentatonicB.roman} ${activePentatonicB.name}`,
+        notes: activePentatonicB.notes,
+        noteNames: activePentatonicB.noteNames,
+        root: activePentatonicB.root
+      };
+    }
     return {
       label: `${scaleB.noteNames[0]} ${scaleB.label}`,
       notes: scaleB.notes,
       noteNames: scaleB.noteNames,
       root: rootB
     };
-  }, [arpeggiosB, materialModeB, rootB, scaleB, selectedArpeggioB]);
+  }, [activePentatonicB, arpeggiosB, materialModeB, rootB, scaleB, selectedArpeggioB]);
 
   const activeComparison = useMemo(() => compareMaterials(materialA.notes, materialB.notes), [materialA.notes, materialB.notes]);
 
@@ -151,6 +199,10 @@ export function MainExplorerPage() {
     setArpeggioTypeB("seventh");
     setSelectedArpeggioA(0);
     setSelectedArpeggioB(0);
+    setPentatonicTypeA("major");
+    setPentatonicTypeB("major");
+    setSelectedPentatonicA(0);
+    setSelectedPentatonicB(0);
     setFretRange({ ...DEFAULT_FRET_RANGE });
     setActiveStrings(allStrings());
   };
@@ -199,6 +251,9 @@ export function MainExplorerPage() {
           arpeggioType={arpeggioTypeA}
           arpeggios={arpeggiosA}
           selectedArpeggio={selectedArpeggioA}
+          pentatonicType={pentatonicTypeA}
+          pentatonics={pentatonicsA}
+          selectedPentatonic={selectedPentatonicA}
           displayMode={displayMode}
           degreeLabels={degreeLabelsA}
           onRootChange={setRootA}
@@ -206,6 +261,8 @@ export function MainExplorerPage() {
           onMaterialModeChange={setMaterialModeA}
           onArpeggioTypeChange={setArpeggioTypeA}
           onSelectedArpeggioChange={setSelectedArpeggioA}
+          onPentatonicTypeChange={setPentatonicTypeA}
+          onSelectedPentatonicChange={setSelectedPentatonicA}
         />
         <div className="stack">
           <SystemSelector
@@ -217,6 +274,9 @@ export function MainExplorerPage() {
             arpeggioType={arpeggioTypeB}
             arpeggios={arpeggiosB}
             selectedArpeggio={selectedArpeggioB}
+            pentatonicType={pentatonicTypeB}
+            pentatonics={pentatonicsB}
+            selectedPentatonic={selectedPentatonicB}
             displayMode={displayMode}
             degreeLabels={degreeLabelsB}
             onRootChange={setRootB}
@@ -224,6 +284,8 @@ export function MainExplorerPage() {
             onMaterialModeChange={setMaterialModeB}
             onArpeggioTypeChange={setArpeggioTypeB}
             onSelectedArpeggioChange={setSelectedArpeggioB}
+            onPentatonicTypeChange={setPentatonicTypeB}
+            onSelectedPentatonicChange={setSelectedPentatonicB}
           />
         </div>
         <div className="stack">

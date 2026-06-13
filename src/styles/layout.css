@@ -133,6 +133,10 @@
   grid-template-columns: 1fr 1fr;
 }
 
+.segmented-control.three-materials {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
 .segmented-control button,
 .mode-button,
 .reset-button {
@@ -470,7 +474,8 @@
   .mode-grid.three-buttons,
   .fret-range-presets,
   .range-control-grid,
-  .segmented-control {
+  .segmented-control,
+  .segmented-control.three-materials {
     grid-template-columns: 1fr;
   }
 }

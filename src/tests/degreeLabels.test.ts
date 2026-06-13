@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   buildDegreeLabels,
+  buildDegreeLabelsFromPitchClasses,
   buildDegreeLabelsFromScaleDegree,
   combinedDegreeLabel,
   labelsForPitchClasses,
@@ -48,5 +49,13 @@ describe("degree labels", () => {
   it("labels a Dm7 arpeggio from C Ionian relative to D Dorian", () => {
     const dDorian = buildDegreeLabelsFromScaleDegree([0, 2, 4, 5, 7, 9, 11], 1);
     expect(labelsForPitchClasses([2, 5, 9, 0], dDorian)).toEqual(["1", "b3", "5", "b7"]);
+  });
+
+  it("uses the selected pentatonic formula as the degree reference", () => {
+    const aMinorPentatonic = buildDegreeLabelsFromPitchClasses(
+      [9, 0, 2, 4, 7],
+      ["1", "b3", "4", "5", "b7"]
+    );
+    expect(labelsForPitchClasses([9, 0, 2, 4, 7], aMinorPentatonic)).toEqual(["1", "b3", "4", "5", "b7"]);
   });
 });
