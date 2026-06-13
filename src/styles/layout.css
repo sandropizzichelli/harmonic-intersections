@@ -91,6 +91,13 @@
   text-transform: uppercase;
 }
 
+.field-label {
+  color: var(--text-muted);
+  font-size: 0.78rem;
+  font-weight: 750;
+  text-transform: uppercase;
+}
+
 .field select,
 .locked-value {
   width: 100%;
@@ -121,6 +128,23 @@
 
 .material-toggle {
   margin: 14px 0;
+}
+
+.caged-control {
+  display: grid;
+  gap: 7px;
+  margin-bottom: 14px;
+}
+
+.caged-selector {
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+}
+
+.caged-position-summary {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 0.74rem;
+  font-weight: 700;
 }
 
 .segmented-control,
@@ -470,6 +494,10 @@
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 
+  .caged-selector {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
   .mode-grid,
   .mode-grid.three-buttons,
   .fret-range-presets,
@@ -477,5 +505,9 @@
   .segmented-control,
   .segmented-control.three-materials {
     grid-template-columns: 1fr;
+  }
+
+  .mode-grid.caged-selector {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }

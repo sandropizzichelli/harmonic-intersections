@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { AppHeader } from "../components/AppHeader";
 import { DisplayModeSelector, type DisplayMode } from "../components/DisplayModeSelector";
-import { Fretboard, type PitchClassVisualState } from "../components/Fretboard";
+import { Fretboard } from "../components/Fretboard";
 import { FretboardLegend } from "../components/FretboardLegend";
 import { FretRangeSelector, type FretRange } from "../components/FretRangeSelector";
 import { IntervalSelector } from "../components/IntervalSelector";
@@ -17,6 +17,7 @@ import {
 import type { ScaleId } from "../data/scales";
 import type { SpellingPreference } from "../data/noteNames";
 import { generateArpeggios, type ArpeggioType } from "../music/arpeggioGenerator";
+import { cagedPositionFor, type CagedShape } from "../music/cagedPositions";
 import {
   buildDegreeLabelsFromPitchClasses,
   buildDegreeLabelsFromScaleDegree
@@ -27,12 +28,6 @@ import { STANDARD_TUNING } from "../music/fretboardMapper";
 import { generatePentatonics, type PentatonicType } from "../music/pentatonicGenerator";
 import { generateScale } from "../music/scaleGenerator";
 
-const toSet = (items: PitchClass[]) => new Set(items);
-const keepRootsIn = (roots: PitchClass[], visibleNotes: Set<PitchClass>) =>
-  toSet(roots.filter((root) => visibleNotes.has(root)));
-const withoutPitchClasses = (source: Set<PitchClass>, excluded: Set<PitchClass>) =>
-  new Set([...source].filter((pitchClass) => !excluded.has(pitchClass)));
-const unionPitchClasses = (...sets: Set<PitchClass>[]) => new Set(sets.flatMap((set) => [...set]));
 const DEFAULT_VISUALIZATION_LAYERS: VisualizationLayers = {
   notesA: true,
   notesB: true,
@@ -56,6 +51,8 @@ export function MainExplorerPage() {
   const [arpeggioTypeB, setArpeggioTypeB] = useState<ArpeggioType>("seventh");
   const [selectedArpeggioA, setSelectedArpeggioA] = useState(0);
   const [selectedArpeggioB, setSelectedArpeggioB] = useState(0);
+  const [cagedShapeA, setCagedShapeA] = useState<CagedShape>("all");
+  const [cagedShapeB, setCagedShapeB] = useState<CagedShape>("all");
   const [pentatonicTypeA, setPentatonicTypeA] = useState<PentatonicType>("major");
   const [pentatonicTypeB, setPentatonicTypeB] = useState<PentatonicType>("major");
   const [selectedPentatonicA, setSelectedPentatonicA] = useState(0);
@@ -166,6 +163,10 @@ export function MainExplorerPage() {
   }, [activePentatonicB, arpeggiosB, materialModeB, rootB, scaleB, selectedArpeggioB]);
 
   const activeComparison = useMemo(() => compareMaterials(materialA.notes, materialB.notes), [materialA.notes, materialB.notes]);
+  const cagedPositionA =
+    materialModeA === "arpeggios" ? cagedPositionFor(materialA.root, cagedShapeA) : null;
+  const cagedPositionB =
+    materialModeB === "arpeggios" ? cagedPositionFor(materialB.root, cagedShapeB) : null;
 
   const toggleVisualizationLayer = (layer: VisualizationLayer) => {
     setVisualizationLayers((current) => ({
@@ -199,6 +200,8 @@ export function MainExplorerPage() {
     setArpeggioTypeB("seventh");
     setSelectedArpeggioA(0);
     setSelectedArpeggioB(0);
+    setCagedShapeA("all");
+    setCagedShapeB("all");
     setPentatonicTypeA("major");
     setPentatonicTypeB("major");
     setSelectedPentatonicA(0);
@@ -206,37 +209,6 @@ export function MainExplorerPage() {
     setFretRange({ ...DEFAULT_FRET_RANGE });
     setActiveStrings(allStrings());
   };
-
-  const visualStates: PitchClassVisualState = useMemo(() => {
-    const rootsA = [materialA.root];
-    const rootsB = [materialB.root];
-    const notesA = toSet(activeComparison.a);
-    const notesB = toSet(activeComparison.b);
-    const common = toSet(activeComparison.common);
-    const showCommon = visualizationLayers.common || (visualizationLayers.notesA && visualizationLayers.notesB);
-    const visibleCommon = showCommon ? common : new Set<PitchClass>();
-    const visibleOnlyA = visualizationLayers.notesA ? withoutPitchClasses(notesA, visibleCommon) : new Set<PitchClass>();
-    const visibleOnlyB = visualizationLayers.notesB ? withoutPitchClasses(notesB, visibleCommon) : new Set<PitchClass>();
-    const visibleAForRoots = unionPitchClasses(visibleOnlyA, visibleCommon);
-    const visibleBForRoots = unionPitchClasses(visibleOnlyB, visibleCommon);
-
-    const base = {
-      common: new Set<PitchClass>(),
-      onlyA: new Set<PitchClass>(),
-      onlyB: new Set<PitchClass>(),
-      rootsA: new Set<PitchClass>(),
-      rootsB: new Set<PitchClass>()
-    };
-
-    return {
-      ...base,
-      common: visibleCommon,
-      onlyA: visibleOnlyA,
-      onlyB: visibleOnlyB,
-      rootsA: keepRootsIn(rootsA, visibleAForRoots),
-      rootsB: keepRootsIn(rootsB, visibleBForRoots)
-    };
-  }, [activeComparison, materialA.root, materialB.root, visualizationLayers]);
 
   return (
     <main className="app-shell">
@@ -251,6 +223,8 @@ export function MainExplorerPage() {
           arpeggioType={arpeggioTypeA}
           arpeggios={arpeggiosA}
           selectedArpeggio={selectedArpeggioA}
+          cagedShape={cagedShapeA}
+          cagedPosition={cagedPositionA}
           pentatonicType={pentatonicTypeA}
           pentatonics={pentatonicsA}
           selectedPentatonic={selectedPentatonicA}
@@ -261,6 +235,7 @@ export function MainExplorerPage() {
           onMaterialModeChange={setMaterialModeA}
           onArpeggioTypeChange={setArpeggioTypeA}
           onSelectedArpeggioChange={setSelectedArpeggioA}
+          onCagedShapeChange={setCagedShapeA}
           onPentatonicTypeChange={setPentatonicTypeA}
           onSelectedPentatonicChange={setSelectedPentatonicA}
         />
@@ -274,6 +249,8 @@ export function MainExplorerPage() {
             arpeggioType={arpeggioTypeB}
             arpeggios={arpeggiosB}
             selectedArpeggio={selectedArpeggioB}
+            cagedShape={cagedShapeB}
+            cagedPosition={cagedPositionB}
             pentatonicType={pentatonicTypeB}
             pentatonics={pentatonicsB}
             selectedPentatonic={selectedPentatonicB}
@@ -284,6 +261,7 @@ export function MainExplorerPage() {
             onMaterialModeChange={setMaterialModeB}
             onArpeggioTypeChange={setArpeggioTypeB}
             onSelectedArpeggioChange={setSelectedArpeggioB}
+            onCagedShapeChange={setCagedShapeB}
             onPentatonicTypeChange={setPentatonicTypeB}
             onSelectedPentatonicChange={setSelectedPentatonicB}
           />
@@ -304,7 +282,13 @@ export function MainExplorerPage() {
       <div className="fretboard-block">
         <FretboardLegend />
         <Fretboard
-          states={visualStates}
+          notesA={materialA.notes}
+          notesB={materialB.notes}
+          rootA={materialA.root}
+          rootB={materialB.root}
+          visualizationLayers={visualizationLayers}
+          cagedPositionA={cagedPositionA}
+          cagedPositionB={cagedPositionB}
           spelling={spelling}
           displayMode={displayMode}
           degreeLabelsA={degreeLabelsA}

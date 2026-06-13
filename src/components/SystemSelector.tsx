@@ -1,6 +1,11 @@
 import { NOTE_OPTIONS } from "../data/noteNames";
 import { SCALE_FAMILIES, SCALES, type ScaleId } from "../data/scales";
 import { ARPEGGIO_TYPE_OPTIONS, type Arpeggio, type ArpeggioType } from "../music/arpeggioGenerator";
+import {
+  CAGED_SHAPE_OPTIONS,
+  type CagedPosition,
+  type CagedShape
+} from "../music/cagedPositions";
 import { labelsForPitchClasses, type DegreeLabels } from "../music/degreeLabels";
 import {
   PENTATONIC_TYPE_OPTIONS,
@@ -22,6 +27,8 @@ type Props = {
   arpeggioType: ArpeggioType;
   arpeggios: Arpeggio[];
   selectedArpeggio: number;
+  cagedShape: CagedShape;
+  cagedPosition: CagedPosition | null;
   pentatonicType: PentatonicType;
   pentatonics: Pentatonic[];
   selectedPentatonic: number;
@@ -34,6 +41,7 @@ type Props = {
   onMaterialModeChange: (value: MaterialMode) => void;
   onArpeggioTypeChange: (value: ArpeggioType) => void;
   onSelectedArpeggioChange: (value: number) => void;
+  onCagedShapeChange: (value: CagedShape) => void;
   onPentatonicTypeChange: (value: PentatonicType) => void;
   onSelectedPentatonicChange: (value: number) => void;
 };
@@ -52,6 +60,8 @@ export function SystemSelector({
   arpeggioType,
   arpeggios,
   selectedArpeggio,
+  cagedShape,
+  cagedPosition,
   pentatonicType,
   pentatonics,
   selectedPentatonic,
@@ -64,6 +74,7 @@ export function SystemSelector({
   onMaterialModeChange,
   onArpeggioTypeChange,
   onSelectedArpeggioChange,
+  onCagedShapeChange,
   onPentatonicTypeChange,
   onSelectedPentatonicChange
 }: Props) {
@@ -150,6 +161,27 @@ export function SystemSelector({
               ))}
             </select>
           </label>
+          <div className="caged-control">
+            <div className="field-label">CAGED position</div>
+            <div className="mode-grid caged-selector">
+              {CAGED_SHAPE_OPTIONS.map((option) => (
+                <button
+                  aria-pressed={cagedShape === option.id}
+                  className={cagedShape === option.id ? "mode-button active" : "mode-button"}
+                  key={option.id}
+                  onClick={() => onCagedShapeChange(option.id)}
+                  type="button"
+                >
+                  {option.label}
+                </button>
+              ))}
+            </div>
+            <p className="caged-position-summary">
+              {cagedPosition
+                ? `${cagedPosition.shape} shape · frets ${cagedPosition.start}–${cagedPosition.end}`
+                : "All positions"}
+            </p>
+          </div>
         </>
       ) : null}
       {materialMode === "pentatonics" ? (
