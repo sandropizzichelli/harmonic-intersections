@@ -1,5 +1,11 @@
 import { describe, expect, it } from "vitest";
-import { buildDegreeLabels, combinedDegreeLabel, labelsForPitchClasses } from "../music/degreeLabels";
+import {
+  buildDegreeLabels,
+  buildDegreeLabelsFromScaleDegree,
+  combinedDegreeLabel,
+  labelsForPitchClasses,
+  rotateScaleNotes
+} from "../music/degreeLabels";
 
 describe("degree labels", () => {
   const cIonian = buildDegreeLabels([0, 2, 4, 5, 7, 9, 11]);
@@ -28,5 +34,19 @@ describe("degree labels", () => {
 
   it("collapses equal common degrees into one label", () => {
     expect(combinedDegreeLabel(0, cIonian, cIonian, true, true)).toBe("1");
+  });
+
+  it("rotates the parent scale to the selected arpeggio degree", () => {
+    expect(rotateScaleNotes([8, 10, 0, 1, 3, 5, 7], 4)).toEqual([3, 5, 7, 8, 10, 0, 1]);
+  });
+
+  it("labels an Eb7 arpeggio from Ab Ionian relative to Eb Mixolydian", () => {
+    const ebMixolydian = buildDegreeLabelsFromScaleDegree([8, 10, 0, 1, 3, 5, 7], 4);
+    expect(labelsForPitchClasses([3, 7, 10, 1], ebMixolydian)).toEqual(["1", "3", "5", "b7"]);
+  });
+
+  it("labels a Dm7 arpeggio from C Ionian relative to D Dorian", () => {
+    const dDorian = buildDegreeLabelsFromScaleDegree([0, 2, 4, 5, 7, 9, 11], 1);
+    expect(labelsForPitchClasses([2, 5, 9, 0], dDorian)).toEqual(["1", "b3", "5", "b7"]);
   });
 });

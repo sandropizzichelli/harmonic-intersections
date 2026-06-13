@@ -17,7 +17,7 @@ import {
 import type { ScaleId } from "../data/scales";
 import type { SpellingPreference } from "../data/noteNames";
 import { generateArpeggios, type ArpeggioType } from "../music/arpeggioGenerator";
-import { buildDegreeLabels } from "../music/degreeLabels";
+import { buildDegreeLabelsFromScaleDegree } from "../music/degreeLabels";
 import { compareMaterials } from "../music/intersectionAnalyzer";
 import { normalizePitchClass, type PitchClass } from "../music/pitchClass";
 import { STANDARD_TUNING } from "../music/fretboardMapper";
@@ -60,8 +60,18 @@ export function MainExplorerPage() {
   const scaleB = useMemo(() => generateScale(rootB, scaleBId, spelling), [rootB, scaleBId, spelling]);
   const arpeggiosA = useMemo(() => generateArpeggios(scaleA, spelling, "A", arpeggioTypeA), [scaleA, spelling, arpeggioTypeA]);
   const arpeggiosB = useMemo(() => generateArpeggios(scaleB, spelling, "B", arpeggioTypeB), [scaleB, spelling, arpeggioTypeB]);
-  const degreeLabelsA = useMemo(() => buildDegreeLabels(scaleA.notes), [scaleA.notes]);
-  const degreeLabelsB = useMemo(() => buildDegreeLabels(scaleB.notes), [scaleB.notes]);
+  const degreeReferenceA =
+    materialModeA === "arpeggios" ? arpeggiosA[selectedArpeggioA]?.degree ?? 0 : 0;
+  const degreeReferenceB =
+    materialModeB === "arpeggios" ? arpeggiosB[selectedArpeggioB]?.degree ?? 0 : 0;
+  const degreeLabelsA = useMemo(
+    () => buildDegreeLabelsFromScaleDegree(scaleA.notes, degreeReferenceA),
+    [degreeReferenceA, scaleA.notes]
+  );
+  const degreeLabelsB = useMemo(
+    () => buildDegreeLabelsFromScaleDegree(scaleB.notes, degreeReferenceB),
+    [degreeReferenceB, scaleB.notes]
+  );
 
   useEffect(() => {
     setSelectedArpeggioA(0);

@@ -23,6 +23,18 @@ export const buildDegreeLabels = (scaleNotes: PitchClass[]): DegreeLabels => {
   );
 };
 
+export const rotateScaleNotes = (scaleNotes: PitchClass[], startingDegree: number): PitchClass[] => {
+  if (!scaleNotes.length) return [];
+
+  const normalizedDegree = ((startingDegree % scaleNotes.length) + scaleNotes.length) % scaleNotes.length;
+  return [...scaleNotes.slice(normalizedDegree), ...scaleNotes.slice(0, normalizedDegree)];
+};
+
+export const buildDegreeLabelsFromScaleDegree = (
+  scaleNotes: PitchClass[],
+  startingDegree: number
+): DegreeLabels => buildDegreeLabels(rotateScaleNotes(scaleNotes, startingDegree));
+
 export const labelsForPitchClasses = (pitchClasses: PitchClass[], degreeLabels: DegreeLabels): string[] =>
   pitchClasses.map((pitchClass) => degreeLabels.get(pitchClass) ?? "–");
 
