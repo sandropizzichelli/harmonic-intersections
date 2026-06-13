@@ -213,3 +213,11 @@
 .fret-note.root-a.root-b {
   box-shadow: 0 0 0 3px rgba(47, 111, 189, 0.24), 0 0 0 6px rgba(182, 101, 45, 0.18);
 }
+
+.fret-note.degree-label {
+  font-size: 0.82rem;
+}
+
+.fret-note.dual-degree-label {
+  font-size: 0.68rem;
+}

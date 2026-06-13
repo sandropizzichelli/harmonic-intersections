@@ -2,6 +2,8 @@ import { buildFretboard } from "../music/fretboardMapper";
 import { pitchClassName, type PitchClass } from "../music/pitchClass";
 import type { SpellingPreference } from "../data/noteNames";
 import type { CSSProperties } from "react";
+import { combinedDegreeLabel, type DegreeLabels } from "../music/degreeLabels";
+import type { DisplayMode } from "./DisplayModeSelector";
 import type { FretRange } from "./FretRangeSelector";
 
 export type PitchClassVisualState = {
@@ -15,6 +17,9 @@ export type PitchClassVisualState = {
 type Props = {
   states: PitchClassVisualState;
   spelling: SpellingPreference;
+  displayMode: DisplayMode;
+  degreeLabelsA: DegreeLabels;
+  degreeLabelsB: DegreeLabels;
   fretRange: FretRange;
   fretCount?: number;
 };
@@ -37,7 +42,15 @@ const stateClassFor = (pitchClass: PitchClass, states: PitchClassVisualState) =>
   return classes.join(" ");
 };
 
-export function Fretboard({ states, spelling, fretRange, fretCount = 12 }: Props) {
+export function Fretboard({
+  states,
+  spelling,
+  displayMode,
+  degreeLabelsA,
+  degreeLabelsB,
+  fretRange,
+  fretCount = 12
+}: Props) {
   const strings = buildFretboard(fretCount);
   const activePitchClasses = new Set([
     ...states.common,
@@ -88,13 +101,24 @@ export function Fretboard({ states, spelling, fretRange, fretCount = 12 }: Props
                 ]
                   .filter(Boolean)
                   .join(" ");
+                const belongsToA = states.common.has(position.pitchClass) || states.onlyA.has(position.pitchClass);
+                const belongsToB = states.common.has(position.pitchClass) || states.onlyB.has(position.pitchClass);
+                const noteLabel =
+                  displayMode === "degrees"
+                    ? combinedDegreeLabel(position.pitchClass, degreeLabelsA, degreeLabelsB, belongsToA, belongsToB)
+                    : pitchClassName(position.pitchClass, spelling);
+                const noteClasses = [
+                  stateClassFor(position.pitchClass, states),
+                  displayMode === "degrees" ? "degree-label" : "",
+                  noteLabel.includes("/") ? "dual-degree-label" : ""
+                ]
+                  .filter(Boolean)
+                  .join(" ");
 
                 return (
                   <div className={cellClasses} key={`${position.stringNumber}-${position.fret}`}>
                     {isInRange && activePitchClasses.has(position.pitchClass) ? (
-                    <span className={stateClassFor(position.pitchClass, states)}>
-                      {pitchClassName(position.pitchClass, spelling)}
-                    </span>
+                    <span className={noteClasses}>{noteLabel}</span>
                     ) : null}
                   </div>
                 );

@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { AppHeader } from "../components/AppHeader";
-import { DisplayPreferences } from "../components/DisplayPreferences";
+import { DisplayModeSelector, type DisplayMode } from "../components/DisplayModeSelector";
 import { Fretboard, type PitchClassVisualState } from "../components/Fretboard";
 import { FretboardLegend } from "../components/FretboardLegend";
 import { FretRangeSelector, type FretRange } from "../components/FretRangeSelector";
@@ -16,6 +16,7 @@ import {
 import type { ScaleId } from "../data/scales";
 import type { SpellingPreference } from "../data/noteNames";
 import { generateArpeggios, type ArpeggioType } from "../music/arpeggioGenerator";
+import { buildDegreeLabels } from "../music/degreeLabels";
 import { compareMaterials } from "../music/intersectionAnalyzer";
 import { normalizePitchClass, type PitchClass } from "../music/pitchClass";
 import { generateScale } from "../music/scaleGenerator";
@@ -32,9 +33,11 @@ const DEFAULT_VISUALIZATION_LAYERS: VisualizationLayers = {
   common: true
 };
 const DEFAULT_FRET_RANGE: FretRange = { start: 0, end: 12 };
+const DEFAULT_SPELLING: SpellingPreference = "flats";
 
 export function MainExplorerPage() {
-  const [spelling, setSpelling] = useState<SpellingPreference>("flats");
+  const spelling = DEFAULT_SPELLING;
+  const [displayMode, setDisplayMode] = useState<DisplayMode>("notes");
   const [rootA, setRootA] = useState(0);
   const [scaleAId, setScaleAId] = useState<ScaleId>("ionian");
   const [rootB, setRootB] = useState(0);
@@ -53,6 +56,8 @@ export function MainExplorerPage() {
   const scaleB = useMemo(() => generateScale(rootB, scaleBId, spelling), [rootB, scaleBId, spelling]);
   const arpeggiosA = useMemo(() => generateArpeggios(scaleA, spelling, "A", arpeggioTypeA), [scaleA, spelling, arpeggioTypeA]);
   const arpeggiosB = useMemo(() => generateArpeggios(scaleB, spelling, "B", arpeggioTypeB), [scaleB, spelling, arpeggioTypeB]);
+  const degreeLabelsA = useMemo(() => buildDegreeLabels(scaleA.notes), [scaleA.notes]);
+  const degreeLabelsB = useMemo(() => buildDegreeLabels(scaleB.notes), [scaleB.notes]);
 
   useEffect(() => {
     setSelectedArpeggioA(0);
@@ -108,7 +113,7 @@ export function MainExplorerPage() {
   };
 
   const resetPreset = () => {
-    setSpelling("flats");
+    setDisplayMode("notes");
     setRootA(0);
     setScaleAId("ionian");
     setRootB(0);
@@ -167,6 +172,8 @@ export function MainExplorerPage() {
           arpeggioType={arpeggioTypeA}
           arpeggios={arpeggiosA}
           selectedArpeggio={selectedArpeggioA}
+          displayMode={displayMode}
+          degreeLabels={degreeLabelsA}
           onRootChange={setRootA}
           onScaleChange={setScaleAId}
           onMaterialModeChange={setMaterialModeA}
@@ -183,6 +190,8 @@ export function MainExplorerPage() {
             arpeggioType={arpeggioTypeB}
             arpeggios={arpeggiosB}
             selectedArpeggio={selectedArpeggioB}
+            displayMode={displayMode}
+            degreeLabels={degreeLabelsB}
             onRootChange={setRootB}
             onScaleChange={setScaleBId}
             onMaterialModeChange={setMaterialModeB}
@@ -191,7 +200,7 @@ export function MainExplorerPage() {
           />
         </div>
         <div className="stack">
-          <DisplayPreferences spelling={spelling} onChange={setSpelling} />
+          <DisplayModeSelector mode={displayMode} onChange={setDisplayMode} />
           <VisualizationSelector layers={visualizationLayers} onToggle={toggleVisualizationLayer} />
           <IntervalSelector interval={intervalToB} />
           <FretRangeSelector range={fretRange} onChange={setFretRange} />
@@ -201,10 +210,25 @@ export function MainExplorerPage() {
 
       <div className="fretboard-block">
         <FretboardLegend />
-        <Fretboard states={visualStates} spelling={spelling} fretRange={fretRange} />
+        <Fretboard
+          states={visualStates}
+          spelling={spelling}
+          displayMode={displayMode}
+          degreeLabelsA={degreeLabelsA}
+          degreeLabelsB={degreeLabelsB}
+          fretRange={fretRange}
+        />
       </div>
 
-      <MaterialComparisonPanel materialA={materialA} materialB={materialB} comparison={activeComparison} spelling={spelling} />
+      <MaterialComparisonPanel
+        materialA={materialA}
+        materialB={materialB}
+        comparison={activeComparison}
+        spelling={spelling}
+        displayMode={displayMode}
+        degreeLabelsA={degreeLabelsA}
+        degreeLabelsB={degreeLabelsB}
+      />
     </main>
   );
 }

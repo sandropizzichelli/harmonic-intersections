@@ -1,7 +1,9 @@
 import { NOTE_OPTIONS } from "../data/noteNames";
 import { SCALE_FAMILIES, SCALES, type ScaleId } from "../data/scales";
 import { ARPEGGIO_TYPE_OPTIONS, type Arpeggio, type ArpeggioType } from "../music/arpeggioGenerator";
+import { labelsForPitchClasses, type DegreeLabels } from "../music/degreeLabels";
 import type { ScaleMaterial } from "../music/scaleGenerator";
+import type { DisplayMode } from "./DisplayModeSelector";
 import { NoteChips } from "./NoteChips";
 
 export type MaterialMode = "scales" | "arpeggios";
@@ -15,6 +17,8 @@ type Props = {
   arpeggioType: ArpeggioType;
   arpeggios: Arpeggio[];
   selectedArpeggio: number;
+  displayMode: DisplayMode;
+  degreeLabels: DegreeLabels;
   rootLocked?: boolean;
   rootLabel?: string;
   onRootChange?: (value: number) => void;
@@ -36,6 +40,8 @@ export function SystemSelector({
   arpeggioType,
   arpeggios,
   selectedArpeggio,
+  displayMode,
+  degreeLabels,
   rootLocked = false,
   rootLabel,
   onRootChange,
@@ -45,7 +51,13 @@ export function SystemSelector({
   onSelectedArpeggioChange
 }: Props) {
   const activeArpeggio = arpeggios[selectedArpeggio];
-  const activeNotes = materialMode === "arpeggios" && activeArpeggio ? activeArpeggio.noteNames : scale.noteNames;
+  const activePitchClasses = materialMode === "arpeggios" && activeArpeggio ? activeArpeggio.notes : scale.notes;
+  const activeNotes =
+    displayMode === "degrees"
+      ? labelsForPitchClasses(activePitchClasses, degreeLabels)
+      : materialMode === "arpeggios" && activeArpeggio
+        ? activeArpeggio.noteNames
+        : scale.noteNames;
 
   return (
     <section className="panel">
@@ -112,7 +124,18 @@ export function SystemSelector({
           </label>
         </>
       ) : null}
-      <NoteChips label={materialMode === "arpeggios" ? "Note arpeggio" : "Note scala"} notes={activeNotes} />
+      <NoteChips
+        label={
+          displayMode === "degrees"
+            ? materialMode === "arpeggios"
+              ? "Gradi arpeggio"
+              : "Gradi scala"
+            : materialMode === "arpeggios"
+              ? "Note arpeggio"
+              : "Note scala"
+        }
+        notes={activeNotes}
+      />
     </section>
   );
 }
