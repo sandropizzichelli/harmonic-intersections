@@ -169,6 +169,25 @@
   grid-template-columns: repeat(4, minmax(0, 1fr));
 }
 
+.string-selector {
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+}
+
+.panel-action-button {
+  border: 0;
+  background: transparent;
+  color: var(--accent);
+  cursor: pointer;
+  font-size: 0.78rem;
+  font-weight: 800;
+}
+
+.panel-action-button:disabled {
+  color: var(--text-muted);
+  cursor: default;
+  opacity: 0.45;
+}
+
 .range-control-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -319,6 +338,10 @@
   .app-shell {
     width: min(100% - 18px, 1500px);
     padding-top: 18px;
+  }
+
+  .string-selector {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 
   .mode-grid,

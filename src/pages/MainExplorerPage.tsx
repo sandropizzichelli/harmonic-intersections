@@ -7,6 +7,7 @@ import { FretRangeSelector, type FretRange } from "../components/FretRangeSelect
 import { IntervalSelector } from "../components/IntervalSelector";
 import { MaterialComparisonPanel, type ActiveMaterialSummary } from "../components/MaterialComparisonPanel";
 import { PresetResetPanel } from "../components/PresetResetPanel";
+import { StringSelector, type ActiveStrings } from "../components/StringSelector";
 import { SystemSelector, type MaterialMode } from "../components/SystemSelector";
 import {
   VisualizationSelector,
@@ -19,6 +20,7 @@ import { generateArpeggios, type ArpeggioType } from "../music/arpeggioGenerator
 import { buildDegreeLabels } from "../music/degreeLabels";
 import { compareMaterials } from "../music/intersectionAnalyzer";
 import { normalizePitchClass, type PitchClass } from "../music/pitchClass";
+import { STANDARD_TUNING } from "../music/fretboardMapper";
 import { generateScale } from "../music/scaleGenerator";
 
 const toSet = (items: PitchClass[]) => new Set(items);
@@ -34,6 +36,7 @@ const DEFAULT_VISUALIZATION_LAYERS: VisualizationLayers = {
 };
 const DEFAULT_FRET_RANGE: FretRange = { start: 0, end: 12 };
 const DEFAULT_SPELLING: SpellingPreference = "flats";
+const allStrings = (): ActiveStrings => new Set(STANDARD_TUNING.map((string) => string.stringNumber));
 
 export function MainExplorerPage() {
   const spelling = DEFAULT_SPELLING;
@@ -50,6 +53,7 @@ export function MainExplorerPage() {
   const [selectedArpeggioA, setSelectedArpeggioA] = useState(0);
   const [selectedArpeggioB, setSelectedArpeggioB] = useState(0);
   const [fretRange, setFretRange] = useState<FretRange>(DEFAULT_FRET_RANGE);
+  const [activeStrings, setActiveStrings] = useState<ActiveStrings>(allStrings);
 
   const intervalToB = normalizePitchClass(rootB - rootA);
   const scaleA = useMemo(() => generateScale(rootA, scaleAId, spelling), [rootA, scaleAId, spelling]);
@@ -112,6 +116,18 @@ export function MainExplorerPage() {
     }));
   };
 
+  const toggleString = (stringNumber: number) => {
+    setActiveStrings((current) => {
+      const next = new Set(current);
+      if (next.has(stringNumber)) {
+        next.delete(stringNumber);
+      } else {
+        next.add(stringNumber);
+      }
+      return next;
+    });
+  };
+
   const resetPreset = () => {
     setDisplayMode("notes");
     setRootA(0);
@@ -126,6 +142,7 @@ export function MainExplorerPage() {
     setSelectedArpeggioA(0);
     setSelectedArpeggioB(0);
     setFretRange({ ...DEFAULT_FRET_RANGE });
+    setActiveStrings(allStrings());
   };
 
   const visualStates: PitchClassVisualState = useMemo(() => {
@@ -204,6 +221,11 @@ export function MainExplorerPage() {
           <VisualizationSelector layers={visualizationLayers} onToggle={toggleVisualizationLayer} />
           <IntervalSelector interval={intervalToB} />
           <FretRangeSelector range={fretRange} onChange={setFretRange} />
+          <StringSelector
+            activeStrings={activeStrings}
+            onToggle={toggleString}
+            onSelectAll={() => setActiveStrings(allStrings())}
+          />
           <PresetResetPanel onReset={resetPreset} />
         </div>
       </div>
@@ -217,6 +239,7 @@ export function MainExplorerPage() {
           degreeLabelsA={degreeLabelsA}
           degreeLabelsB={degreeLabelsB}
           fretRange={fretRange}
+          activeStrings={activeStrings}
         />
       </div>
 

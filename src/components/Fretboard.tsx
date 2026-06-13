@@ -5,6 +5,7 @@ import type { CSSProperties } from "react";
 import { combinedDegreeLabel, type DegreeLabels } from "../music/degreeLabels";
 import type { DisplayMode } from "./DisplayModeSelector";
 import type { FretRange } from "./FretRangeSelector";
+import type { ActiveStrings } from "./StringSelector";
 
 export type PitchClassVisualState = {
   common: Set<PitchClass>;
@@ -21,6 +22,7 @@ type Props = {
   degreeLabelsA: DegreeLabels;
   degreeLabelsB: DegreeLabels;
   fretRange: FretRange;
+  activeStrings: ActiveStrings;
   fretCount?: number;
 };
 
@@ -49,6 +51,7 @@ export function Fretboard({
   degreeLabelsA,
   degreeLabelsB,
   fretRange,
+  activeStrings,
   fretCount = 12
 }: Props) {
   const strings = buildFretboard(fretCount);
@@ -89,9 +92,16 @@ export function Fretboard({
               );
             })}
           </div>
-          {strings.map((string) => (
-            <div className="string-row" key={string[0].stringNumber}>
-              <span className="string-label">{string[0].stringName}</span>
+          {strings.map((string) => {
+            const stringNumber = string[0].stringNumber;
+            const isStringActive = activeStrings.has(stringNumber);
+
+            return (
+            <div className={isStringActive ? "string-row" : "string-row string-disabled"} key={stringNumber}>
+              <span className="string-label">
+                <span className="string-number">{stringNumber}</span>
+                {string[0].stringName}
+              </span>
               {string.map((position) => {
                 const isInRange = position.fret >= fretRange.start && position.fret <= fretRange.end;
                 const cellClasses = [
@@ -117,14 +127,15 @@ export function Fretboard({
 
                 return (
                   <div className={cellClasses} key={`${position.stringNumber}-${position.fret}`}>
-                    {isInRange && activePitchClasses.has(position.pitchClass) ? (
+                    {isStringActive && isInRange && activePitchClasses.has(position.pitchClass) ? (
                     <span className={noteClasses}>{noteLabel}</span>
                     ) : null}
                   </div>
                 );
               })}
             </div>
-          ))}
+            );
+          })}
         </div>
       </div>
     </section>
